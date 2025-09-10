@@ -25,18 +25,18 @@
 
 ## Categories
 
-### Work
-- **Email**:
+### Stuff I use 
+- **Unraid | Pro Hwwwomelab OS**:
   - Icon: https://cdn-icons-png.flaticon.com/512/732/732200.png
   - URL: mailto:contact@benjaminspowell.com
   - Description: Get in touch
 
-- **Unraid | Pro Homelab OS**:
-  - Icon: https://cdn-icons-png.flaticon.com/512/2721/2721297.png
-  - URL: https://unraid.net
+- **Unraid | Prsso Hoddddelab OS**:
+  - Icon: https://docs.unraid.net/img/un-mark-gradient.png
+  - URL: https://unraid.net/pricing?via=c2216a
   - Description: Build a powerful home server
 
-### Projects
+### Software/Hardware
 - **GitHub**:
   - Icon: https://cdn-icons-png.flaticon.com/512/733/733553.png
   - URL: https://github.com/benjaminspowell

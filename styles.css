@@ -77,7 +77,8 @@ body {
 .social-icon img,
 .card-icon img {
   display: block;
-  width: 24px; height: 24px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
 }
 
