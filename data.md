@@ -13,7 +13,7 @@
 
 - **GitHub**:
   - Icon: https://cdn-icons-png.flaticon.com/512/733/733553.png
-  - URL: https://github.com/benjaminspowell
+  - URL: https://github.com/kingfisherfox
 
 - **YouTube**:
   - Icon: https://cdn-icons-png.flaticon.com/512/1384/1384060.png
@@ -21,39 +21,20 @@
 
 - **Email**:
   - Icon: https://cdn-icons-png.flaticon.com/512/732/732200.png
-  - URL: mailto:contact@benjaminspowell.com
+  - URL: mailto:me+clikkable@benjaminspowell.com
 
 ## Categories
 
-### Stuff I use 
-- **Unraid | Pro Hwwwomelab OS**:
-  - Icon: https://cdn-icons-png.flaticon.com/512/732/732200.png
-  - URL: mailto:contact@benjaminspowell.com
-  - Description: Get in touch
-
-- **Unraid | Prsso Hoddddelab OS**:
-  - Icon: https://docs.unraid.net/img/un-mark-gradient.png
+### Software/Hardware
+- **Unraid | Pro Homelab OS**:
+  - Icon: https://avatars.githubusercontent.com/u/42099010?s=200&v=4
   - URL: https://unraid.net/pricing?via=c2216a
   - Description: Build a powerful home server
 
-### Software/Hardware
-- **GitHub**:
-  - Icon: https://cdn-icons-png.flaticon.com/512/733/733553.png
-  - URL: https://github.com/benjaminspowell
-  - Description: View my code repositories
+- **TP-Link Omada**:
+  - Icon: https://img.logo.dev/tp-link.com?token=live_6a1a28fd-6420-4492-aeb0-b297461d9de2&size=64&retina=true
+  - URL: https://www.omadanetworks.com
+  - Description: Build a powerful home server
 
-- **Personal Website**:
-  - Icon: https://cdn-icons-png.flaticon.com/512/1006/1006771.png
-  - URL: https://benjaminspowell.com
-  - Description: My personal portfolio site
 
-### More
-- **Medium Blog**:
-  - Icon: https://cdn-icons-png.flaticon.com/512/5968/5968906.png
-  - URL: https://medium.com/@benjaminspowell
-  - Description: Read my latest articles
 
-- **Linktree**:
-  - Icon: https://cdn-icons-png.flaticon.com/512/3308/3308395.png
-  - URL: https://linktr.ee/benjaminspowell
-  - Description: All my links in one place
