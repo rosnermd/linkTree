@@ -1,8 +1,6 @@
-// Biolink Dynamic Content Loader
 class BiolinkLoader {
     constructor() {
-        this.config = null;
-        this.init();
+        this.data = null;
     }
 
     async init() {
@@ -12,133 +10,231 @@ class BiolinkLoader {
             this.renderSocialLinks();
             this.renderCategories();
         } catch (error) {
-            console.error('Failed to load biolink configuration:', error);
+            console.error('Failed to initialize biolink:', error);
         }
     }
 
     async loadConfig() {
-        const response = await fetch('./config.md');
-        const markdown = await response.text();
-        this.config = this.parseMarkdown(markdown);
+        try {
+            const response = await fetch('data.md');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const markdown = await response.text();
+            this.data = this.parseMarkdown(markdown);
+        } catch (error) {
+            console.error('Error loading configuration:', error);
+            throw error;
+        }
     }
 
     parseMarkdown(markdown) {
-        const config = {
+        const lines = markdown.split('\n');
+        const data = {
             profile: {},
             social: [],
-            categories: {}
+            categories: []
         };
 
-        const lines = markdown.split('\n');
         let currentSection = null;
         let currentCategory = null;
-        let currentItem = null;
+        let currentSocialLink = null;
+        let currentCategoryLink = null;
 
         for (let line of lines) {
             line = line.trim();
-            
-            if (line.startsWith('## Profile Information')) {
+            if (!line) continue;
+
+            // Section headers
+            if (line === '## Profile') {
                 currentSection = 'profile';
-            } else if (line.startsWith('## Social Links')) {
+                continue;
+            }
+            if (line === '## Social Links') {
                 currentSection = 'social';
-            } else if (line.startsWith('## Categories')) {
+                continue;
+            }
+            if (line === '## Categories') {
                 currentSection = 'categories';
-            } else if (line.startsWith('### ') && currentSection === 'categories') {
-                currentCategory = line.replace('### ', '');
-                config.categories[currentCategory] = [];
-            } else if (line.startsWith('- **') && currentSection === 'profile') {
-                const match = line.match(/- \*\*(.+?)\*\*: (.+)/);
+                continue;
+            }
+
+            // Profile data
+            if (currentSection === 'profile' && line.startsWith('- **')) {
+                const match = line.match(/- \*\*(.+)\*\*: (.+)/);
                 if (match) {
-                    const key = match[1].toLowerCase().replace(' ', '_');
-                    config.profile[key] = match[2];
+                    const key = match[1].toLowerCase().replace(/\s+/g, '_');
+                    data.profile[key] = match[2];
                 }
-            } else if (line.startsWith('- **') && currentSection === 'social') {
-                const match = line.match(/- \*\*(.+?)\*\*:/);
-                if (match) {
-                    currentItem = { name: match[1], icon: '', url: '' };
-                    config.social.push(currentItem);
+                continue;
+            }
+
+            // Social links
+            if (currentSection === 'social') {
+                if (line.startsWith('- **') && line.endsWith('**:')) {
+                    if (currentSocialLink) {
+                        data.social.push(currentSocialLink);
+                    }
+                    currentSocialLink = {
+                        name: line.substring(4, line.length - 3),
+                        icon: '',
+                        url: ''
+                    };
+                    continue;
                 }
-            } else if (line.startsWith('- **') && currentSection === 'categories' && currentCategory) {
-                const match = line.match(/- \*\*(.+?)\*\*/);
-                if (match) {
-                    currentItem = { title: match[1], icon: '', url: '', description: '' };
-                    config.categories[currentCategory].push(currentItem);
+                if (currentSocialLink && line.startsWith('  - Icon:')) {
+                    currentSocialLink.icon = line.substring(9).trim();
+                    continue;
                 }
-            } else if (line.includes('Icon:') && currentItem) {
-                const match = line.match(/Icon: (.+)/);
-                if (match) currentItem.icon = match[1];
-            } else if (line.includes('URL:') && currentItem) {
-                const match = line.match(/URL: (.+)/);
-                if (match) currentItem.url = match[1];
-            } else if (line.includes('Description:') && currentItem) {
-                const match = line.match(/Description: (.+)/);
-                if (match) currentItem.description = match[1];
+                if (currentSocialLink && line.startsWith('  - URL:')) {
+                    currentSocialLink.url = line.substring(8).trim();
+                    continue;
+                }
+            }
+
+            // Categories
+            if (currentSection === 'categories') {
+                if (line.startsWith('### ')) {
+                    if (currentCategory) {
+                        data.categories.push(currentCategory);
+                    }
+                    currentCategory = {
+                        name: line.substring(4),
+                        links: []
+                    };
+                    continue;
+                }
+                if (currentCategory && line.startsWith('- **') && line.endsWith('**:')) {
+                    if (currentCategoryLink) {
+                        currentCategory.links.push(currentCategoryLink);
+                    }
+                    currentCategoryLink = {
+                        name: line.substring(4, line.length - 3),
+                        icon: '',
+                        url: '',
+                        description: ''
+                    };
+                    continue;
+                }
+                if (currentCategoryLink && line.startsWith('  - Icon:')) {
+                    currentCategoryLink.icon = line.substring(9).trim();
+                    continue;
+                }
+                if (currentCategoryLink && line.startsWith('  - URL:')) {
+                    currentCategoryLink.url = line.substring(8).trim();
+                    continue;
+                }
+                if (currentCategoryLink && line.startsWith('  - Description:')) {
+                    currentCategoryLink.description = line.substring(16).trim();
+                    continue;
+                }
             }
         }
 
-        return config;
+        // Add last items
+        if (currentSocialLink) {
+            data.social.push(currentSocialLink);
+        }
+        if (currentCategoryLink && currentCategory) {
+            currentCategory.links.push(currentCategoryLink);
+        }
+        if (currentCategory) {
+            data.categories.push(currentCategory);
+        }
+
+        return data;
     }
 
     renderProfile() {
-        if (!this.config.profile) return;
+        if (!this.data || !this.data.profile) return;
+
+        const profile = this.data.profile;
         
-        const heroOverlay = document.querySelector('.hero-overlay');
-        if (heroOverlay) {
-            const profileInfo = heroOverlay.querySelector('.profile-info');
-            if (profileInfo) {
-                profileInfo.innerHTML = `
-                    <h1>${this.config.profile.name || 'Benjamin S Powell'}</h1>
-                    <p>${this.config.profile.username || '@benjaminspowell'}</p>
-                `;
-            }
+        // Update profile name
+        const nameElement = document.querySelector('.profile-info h1');
+        if (nameElement && profile.name) {
+            nameElement.textContent = profile.name;
         }
 
-        // Update hero background if specified
-        if (this.config.profile.hero_image) {
-            const heroSection = document.querySelector('.hero-section');
-            if (heroSection) {
-                heroSection.style.backgroundImage = `url('${this.config.profile.hero_image}')`;
-            }
+        // Update username
+        const usernameElement = document.querySelector('.profile-info p');
+        if (usernameElement && profile.username) {
+            usernameElement.textContent = profile.username;
+        }
+
+        // Update hero background image
+        const heroElement = document.querySelector('.hero');
+        if (heroElement && profile.hero_image) {
+            heroElement.style.backgroundImage = `url('${profile.hero_image}')`;
         }
     }
 
     renderSocialLinks() {
-        const socialLinks = document.querySelector('.social-links');
-        if (!socialLinks || !this.config.social) return;
+        if (!this.data || !this.data.social) return;
 
-        socialLinks.innerHTML = this.config.social.map(social => `
-            <a href="${social.url}" class="social-link" target="_blank" rel="noopener noreferrer">
-                <img src="${social.icon}" alt="${social.name}" width="20" height="20">
-            </a>
-        `).join('');
+        const socialContainer = document.querySelector('.social-links');
+        if (!socialContainer) return;
+
+        socialContainer.innerHTML = '';
+
+        this.data.social.forEach(link => {
+            const linkElement = document.createElement('a');
+            linkElement.href = link.url;
+            linkElement.className = 'social-link';
+            linkElement.target = '_blank';
+            linkElement.rel = 'noopener noreferrer';
+            linkElement.innerHTML = `<img src="${link.icon}" alt="${link.name}" width="24" height="24">`;
+            socialContainer.appendChild(linkElement);
+        });
     }
 
     renderCategories() {
-        const categoriesContainer = document.querySelector('.categories');
-        if (!categoriesContainer || !this.config.categories) return;
+        if (!this.data || !this.data.categories) return;
 
-        categoriesContainer.innerHTML = Object.entries(this.config.categories).map(([categoryName, items]) => `
-            <div class="category">
-                <h3>${categoryName}</h3>
-                <div class="category-links">
-                    ${items.map(item => `
-                        <a href="${item.url}" class="link-card" target="_blank" rel="noopener noreferrer">
-                            <div class="card-icon">
-                                <img src="${item.icon}" alt="${item.title}" width="24" height="24">
-                            </div>
-                            <div class="card-content">
-                                <div class="card-title">${item.title}</div>
-                                <div class="card-subtitle">${item.description}</div>
-                            </div>
-                        </a>
-                    `).join('')}
-                </div>
-            </div>
-        `).join('');
+        const categoriesContainer = document.querySelector('.categories');
+        if (!categoriesContainer) return;
+
+        categoriesContainer.innerHTML = '';
+
+        this.data.categories.forEach(category => {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'category';
+
+            const categoryTitle = document.createElement('h3');
+            categoryTitle.textContent = category.name;
+            categoryDiv.appendChild(categoryTitle);
+
+            const linksDiv = document.createElement('div');
+            linksDiv.className = 'category-links';
+
+            category.links.forEach(link => {
+                const linkCard = document.createElement('a');
+                linkCard.href = link.url;
+                linkCard.className = 'link-card';
+                linkCard.target = '_blank';
+                linkCard.rel = 'noopener noreferrer';
+
+                linkCard.innerHTML = `
+                    <div class="card-icon">
+                        <img src="${link.icon}" alt="${link.name}" width="24" height="24">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">${link.name}</div>
+                        <div class="card-subtitle">${link.description}</div>
+                    </div>
+                `;
+
+                linksDiv.appendChild(linkCard);
+            });
+
+            categoryDiv.appendChild(linksDiv);
+            categoriesContainer.appendChild(categoryDiv);
+        });
     }
 }
 
 // Initialize the biolink loader when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    new BiolinkLoader();
+    const loader = new BiolinkLoader();
+    loader.init();
 });
