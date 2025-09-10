@@ -1,3 +1,4 @@
+<!-- data.md -->
 # Biolink Configuration
 
 ## Profile
@@ -6,21 +7,21 @@
 - **Hero Image**: img/profile.jpg
 
 ## Social Links
-- **Twitter**:
-  - Icon: https://cdn-icons-png.flaticon.com/512/733/733579.png
-  - URL: https://twitter.com/benjaminspowell
-
-- **LinkedIn**:
-  - Icon: https://cdn-icons-png.flaticon.com/512/733/733561.png
-  - URL: https://linkedin.com/in/benjaminspowell
+- **TikTok**:
+  - Icon: https://cdn-icons-png.flaticon.com/512/3046/3046121.png
+  - URL: https://tiktok.com/@benjaminspowell
 
 - **GitHub**:
   - Icon: https://cdn-icons-png.flaticon.com/512/733/733553.png
   - URL: https://github.com/benjaminspowell
 
-- **Instagram**:
-  - Icon: https://cdn-icons-png.flaticon.com/512/733/733558.png
-  - URL: https://instagram.com/benjaminspowell
+- **YouTube**:
+  - Icon: https://cdn-icons-png.flaticon.com/512/1384/1384060.png
+  - URL: https://youtube.com/@benjaminspowell
+
+- **Email**:
+  - Icon: https://cdn-icons-png.flaticon.com/512/732/732200.png
+  - URL: mailto:contact@benjaminspowell.com
 
 ## Categories
 
@@ -53,6 +54,6 @@
   - Description: Read my latest articles
 
 - **Linktree**:
-  - Icon: https://cdn-icons-png.flaticon.png/512/3308/3308395.png
+  - Icon: https://cdn-icons-png.flaticon.com/512/3308/3308395.png
   - URL: https://linktr.ee/benjaminspowell
   - Description: All my links in one place
