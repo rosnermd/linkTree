@@ -76,22 +76,28 @@ body {
   object-fit: contain;
 }
 
-/* Sliding Contact Panel */
+/* Sliding Contact Panel — WebView-safe hiding */
+.contact-collapsible[hidden] { display: none; }
 .contact-collapsible {
   overflow: hidden;
   max-height: 0;
-  transition: max-height 300ms ease, margin 300ms ease;
+  transition: max-height 300ms ease, margin 300ms ease, opacity 200ms ease, transform 200ms ease;
   background: #fff;
-
+  opacity: 0;
+  transform: translateY(-6px);
 }
 .contact-collapsible.open { 
-  padding: 100px 0px 54px 0px;
+  opacity: 1;
+  transform: translateY(0);
+  padding: 100px 0 54px 0; /* your spacing */
 }
 
 .contact-card {
   position: relative;
   padding: 20px 24px 24px;
 }
+
+/* Flip */
 .flip { perspective: 1000px; }
 .flip-inner {
   position: relative;
@@ -177,7 +183,6 @@ body {
 .social-link { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: #f4f4f4; border: 1px solid #e0e0e0; color: #161616; text-decoration: none; transition: all .15s cubic-bezier(0.2,0,0.38,0.9); border-radius: 4px; }
 .social-link:hover { background: #e8e8e8; border-color: #c6c6c6; transform: translateY(-1px); }
 .social-link:active { background: #d4d4d4; transform: translateY(0); }
-.social-link i { font-size: 20px; }
 
 /* Responsive */
 @media (max-width: 480px) {

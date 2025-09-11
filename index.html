@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Benjamin Powell - Links</title>
   <link rel="icon" href="/img/profile.jpg" type="image/jpg">
+
   <!-- Primary Meta Tags -->
   <meta name="title" content="Benjamin Powell - Links" />
   <meta name="description" content="Home labs, AI, technology, networking, 3D printing, code, product development, and coffee. The things I love." />
@@ -61,7 +62,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script src="script.js" defer></script>
+  <script src="form.js" defer></script>
 
+  <noscript><style>#contact-panel{display:none!important}</style></noscript>
 </head>
 
 <body>
@@ -81,8 +84,12 @@
     <!-- Social Icons Row -->
     <div class="social-row"></div>
 
-    <!-- Sliding Contact Panel (hidden by default) -->
-    <section id="contact-panel" class="contact-collapsible" aria-hidden="true" inert>
+    <!-- Sliding Contact Panel (hidden by default; WebView-safe) -->
+    <section id="contact-panel"
+             class="contact-collapsible"
+             aria-hidden="true"
+             hidden
+             style="max-height:0">
       <div class="contact-card" role="dialog" aria-labelledby="contact-title" aria-modal="false">
         <div class="flip">
           <div class="flip-inner">
