@@ -63,8 +63,6 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script src="script.js" defer></script>
   <script src="form.js" defer></script>
-
-  <noscript><style>#contact-panel{display:none!important}</style></noscript>
 </head>
 
 <body>
@@ -81,19 +79,18 @@
       </div>
     </div>
 
-    <!-- Social Icons Row -->
+    <!-- Social Icons Row (populated by script.js) -->
     <div class="social-row"></div>
 
-    <!-- Sliding Contact Panel (hidden by default; WebView-safe) -->
-    <section id="contact-panel"
-             class="contact-collapsible"
-             aria-hidden="true"
-             hidden
-             style="max-height:0">
-      <div class="contact-card" role="dialog" aria-labelledby="contact-title" aria-modal="false">
+    <!-- Link Categories (populated by script.js) -->
+    <div class="categories"></div>
+
+    <!-- Contact Section (always visible) -->
+    <section id="contact" class="contact-section" aria-labelledby="contact-title">
+      <div class="contact-card">
         <div class="flip">
           <div class="flip-inner">
-            <!-- Front: the form -->
+            <!-- Front: form -->
             <form id="contact-form" class="flip-face front" novalidate>
               <h3 id="contact-title">Send a message</h3>
 
@@ -109,20 +106,20 @@
 
               <div class="field">
                 <label for="cf-message">Message</label>
-                <textarea id="cf-message" name="message" rows="4" required></textarea>
+                <textarea id="cf-message" name="message" rows="5" required></textarea>
               </div>
 
               <p class="helper" id="cf-helper" aria-live="polite"></p>
 
               <div class="actions">
-                <button id="cf-close" type="button" class="btn-secondary" aria-label="Close contact form">Close</button>
                 <button id="cf-submit" type="submit" class="btn-primary">Send</button>
               </div>
             </form>
 
-            <!-- Back: thank-you -->
+            <!-- Back: thank you -->
             <div class="flip-face back" role="status" aria-live="polite">
               <h3>Thank you for your message.</h3>
+              
               <p>I’ll be in touch soon.</p>
             </div>
           </div>
@@ -130,8 +127,6 @@
       </div>
     </section>
 
-    <!-- Links Categories -->
-    <div class="categories"></div>
   </div>
 </body>
 </html>
