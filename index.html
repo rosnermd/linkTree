@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,21 +53,16 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-4YW72RCJ9H', {
-      transport_type: 'beacon'   // more reliable on mobile/in-app browsers
-    });
+    gtag('config', 'G-4YW72RCJ9H', { transport_type: 'beacon' });
   </script>
 
-  <!-- Fonts & Styles -->
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-
-  <!-- App script -->
   <script src="script.js" defer></script>
+  <script src="form.js" defer></script>
 </head>
-
 
 <body>
   <div class="container">
@@ -86,6 +80,48 @@
 
     <!-- Social Icons Row -->
     <div class="social-row"></div>
+
+    <!-- Sliding Contact Panel (hidden by default) -->
+    <section id="contact-panel" class="contact-collapsible" aria-hidden="true" inert>
+      <div class="contact-card" role="dialog" aria-labelledby="contact-title" aria-modal="false">
+        <div class="flip">
+          <div class="flip-inner">
+            <!-- Front: the form -->
+            <form id="contact-form" class="flip-face front" novalidate>
+              <h3 id="contact-title">Send a message</h3>
+
+              <div class="field">
+                <label for="cf-name">Name</label>
+                <input id="cf-name" name="name" type="text" autocomplete="name" required />
+              </div>
+
+              <div class="field">
+                <label for="cf-email">Email</label>
+                <input id="cf-email" name="email" type="email" autocomplete="email" required />
+              </div>
+
+              <div class="field">
+                <label for="cf-message">Message</label>
+                <textarea id="cf-message" name="message" rows="4" required></textarea>
+              </div>
+
+              <p class="helper" id="cf-helper" aria-live="polite"></p>
+
+              <div class="actions">
+                <button id="cf-close" type="button" class="btn-secondary" aria-label="Close contact form">Close</button>
+                <button id="cf-submit" type="submit" class="btn-primary">Send</button>
+              </div>
+            </form>
+
+            <!-- Back: thank-you -->
+            <div class="flip-face back" role="status" aria-live="polite">
+              <h3>Thank you for your message.</h3>
+              <p>I’ll be in touch soon.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- Links Categories -->
     <div class="categories"></div>
