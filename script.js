@@ -12,6 +12,7 @@ class BiolinkLoader {
       this.renderProfile();
       this.renderSocialLinks();
       this.renderCategories();
+      this.bindAnalytics(); // ← GA4 click tracking
     } catch (error) {
       console.error('Failed to initialise biolink:', error);
     }
@@ -27,11 +28,18 @@ class BiolinkLoader {
   normaliseIconUrl(url) {
     if (!url) return '';
     let clean = url.trim();
-    // Fix common paste mistake
     clean = clean.replace('flaticon.png', 'flaticon.com');
-    // Ensure protocol if protocol-relative
     if (clean.startsWith('//')) clean = 'https:' + clean;
     return clean;
+  }
+
+  normaliseHref(url) {
+    if (!url) return '';
+    let u = url.trim();
+    // fix common typos and protocol-relative
+    u = u.replace(/^hhttps:\/\//i, 'https://');
+    if (u.startsWith('//')) u = 'https:' + u;
+    return u;
   }
 
   // Take everything after the FIRST colon, preserving schemes like https:// and mailto:
@@ -40,107 +48,128 @@ class BiolinkLoader {
     return i === -1 ? '' : line.slice(i + 1).trim();
   }
 
-parseMarkdown(markdown) {
-  const lines = markdown.split('\n');
-  const data = { profile: {}, social: [], categories: [] };
-
-  let currentSection = null;
-  let currentCategory = null;
-  let currentItem = null;
-
-  for (let raw of lines) {
-    const line = raw.trim();
-    if (!line) continue;
-
-    // Profile and social headers
-    if (line === '## Profile') { currentSection = 'profile'; continue; }
-
-    if (line === '## Social Links') {
-      // flush any previous item before moving into Social
-      if (currentItem && currentSection === 'category' && currentCategory) {
-        currentCategory.links.push(currentItem);
-        currentItem = null;
-      }
-      currentSection = 'social';
-      continue;
-    }
-
-    // Any ### heading becomes a category
-    if (line.startsWith('### ')) {
-      // flush any leftover social item before leaving social
-      if (currentItem && currentSection === 'social') {
-        data.social.push(currentItem);
-        currentItem = null;
-      }
-      // flush last category item
-      if (currentItem && currentSection === 'category' && currentCategory) {
-        currentCategory.links.push(currentItem);
-        currentItem = null;
-      }
-      if (currentCategory) data.categories.push(currentCategory);
-      currentCategory = { name: line.substring(4).trim(), links: [] };
-      currentSection = 'category';
-      continue;
-    }
-
-    // Profile key/value
-    if (currentSection === 'profile' && line.startsWith('- **')) {
-      const m = line.match(/- \*\*(.+)\*\*: (.+)/);
-      if (m) {
-        const key = m[1].toLowerCase().replace(/\s+/g, '_');
-        data.profile[key] = m[2];
-      }
-      continue;
-    }
-
-    // Social links
-    if (currentSection === 'social') {
-      if (line.startsWith('- **') && line.endsWith('**:')) {
-        if (currentItem) data.social.push(currentItem);
-        currentItem = { name: line.substring(4, line.length - 3), icon: '', url: '' };
-        continue;
-      }
-      if (currentItem && /icon:/i.test(line)) {
-        currentItem.icon = this.normaliseIconUrl(this.afterFirstColon(line));
-        continue;
-      }
-      if (currentItem && /url:/i.test(line)) {
-        currentItem.url = this.afterFirstColon(line);
-        continue;
-      }
-    }
-
-    // Category items
-    if (currentSection === 'category') {
-      if (line.startsWith('- **') && line.endsWith('**:')) {
-        if (currentItem) currentCategory.links.push(currentItem);
-        currentItem = { name: line.substring(4, line.length - 3), icon: '', url: '', description: '' };
-        continue;
-      }
-      if (currentItem && /icon:/i.test(line)) {
-        currentItem.icon = this.normaliseIconUrl(this.afterFirstColon(line));
-        continue;
-      }
-      if (currentItem && /url:/i.test(line)) {
-        currentItem.url = this.afterFirstColon(line);
-        continue;
-      }
-      if (currentItem && /description:/i.test(line)) {
-        currentItem.description = this.afterFirstColon(line);
-        continue;
-      }
+  domainAsName(u) {
+    try {
+      const { hostname } = new URL(u, location.href);
+      return hostname.replace(/^www\./i, '');
+    } catch {
+      return u;
     }
   }
 
-  // Final flushes
-  if (currentItem && currentSection === 'social') data.social.push(currentItem);
-  if (currentItem && currentSection === 'category' && currentCategory) currentCategory.links.push(currentItem);
-  if (currentCategory) data.categories.push(currentCategory);
+  parseMarkdown(markdown) {
+    const lines = markdown.split('\n');
+    const data = { profile: {}, social: [], categories: [] };
 
-  return data;
-}
+    let currentSection = null;
+    let currentCategory = null;
+    let currentItem = null;
 
+    for (let raw of lines) {
+      const line = raw.trim();
+      if (!line) continue;
 
+      // Profile and social headers
+      if (line === '## Profile') { currentSection = 'profile'; continue; }
+
+      if (line === '## Social Links') {
+        // flush any previous item before moving into Social
+        if (currentItem && currentSection === 'category' && currentCategory) {
+          currentCategory.links.push(currentItem);
+          currentItem = null;
+        }
+        currentSection = 'social';
+        continue;
+      }
+
+      // Any ### heading becomes a category
+      if (line.startsWith('### ')) {
+        // flush any leftover social item before leaving social
+        if (currentItem && currentSection === 'social') {
+          data.social.push(currentItem); currentItem = null;
+        }
+        // flush last category item
+        if (currentItem && currentSection === 'category' && currentCategory) {
+          currentCategory.links.push(currentItem); currentItem = null;
+        }
+        if (currentCategory) data.categories.push(currentCategory);
+        currentCategory = { name: line.substring(4).trim(), links: [] };
+        currentSection = 'category';
+        continue;
+      }
+
+      // Profile key/value
+      if (currentSection === 'profile' && line.startsWith('- **')) {
+        const m = line.match(/- \*\*(.+)\*\*: (.+)/);
+        if (m) {
+          const key = m[1].toLowerCase().replace(/\s+/g, '_');
+          data.profile[key] = m[2];
+        }
+        continue;
+      }
+
+      // Social links
+      if (currentSection === 'social') {
+        if (line.startsWith('- **') && line.endsWith('**:')) {
+          if (currentItem) data.social.push(currentItem);
+          currentItem = { name: line.substring(4, line.length - 3), icon: '', url: '' };
+          continue;
+        }
+        if (currentItem && /icon:/i.test(line)) {
+          currentItem.icon = this.normaliseIconUrl(this.afterFirstColon(line));
+          continue;
+        }
+        if (currentItem && /url:/i.test(line)) {
+          currentItem.url = this.normaliseHref(this.afterFirstColon(line));
+          continue;
+        }
+      }
+
+      // Category items
+      if (currentSection === 'category') {
+        if (line.startsWith('- **') && line.endsWith('**:')) {
+          if (currentItem) currentCategory.links.push(currentItem);
+          currentItem = { name: line.substring(4, line.length - 3), icon: '', url: '', description: '' };
+          continue;
+        }
+        if (currentItem && /icon:/i.test(line)) {
+          currentItem.icon = this.normaliseIconUrl(this.afterFirstColon(line));
+          continue;
+        }
+        if (currentItem && /url:/i.test(line)) {
+          currentItem.url = this.normaliseHref(this.afterFirstColon(line));
+          continue;
+        }
+        if (currentItem && /description:/i.test(line)) {
+          currentItem.description = this.afterFirstColon(line);
+          continue;
+        }
+
+        // Handle stray bare URLs (e.g. a line that's just "https://…")
+        if (/^https?:\/\//i.test(line) || /^hhttps:\/\//i.test(line) || line.startsWith('//')) {
+          const fixed = this.normaliseHref(line);
+          if (currentItem && !currentItem.url) {
+            currentItem.url = fixed;
+          } else {
+            currentCategory.links.push({
+              name: this.domainAsName(fixed),
+              icon: '',
+              url: fixed,
+              description: ''
+            });
+          }
+          continue;
+        }
+      }
+    }
+
+    // Final flushes
+    if (currentItem && currentSection === 'social') data.social.push(currentItem);
+    if (currentItem && currentSection === 'category' && currentCategory) currentCategory.links.push(currentItem);
+    if (currentCategory) data.categories.push(currentCategory);
+
+    return data;
+  }
 
   renderProfile() {
     if (!this.data?.profile) return;
@@ -174,7 +203,7 @@ parseMarkdown(markdown) {
     if (!socialContainer || !this.data?.social) return;
     socialContainer.innerHTML = '';
 
-    this.data.social.forEach(link => {
+    this.data.social.forEach((link, idx) => {
       if (!link?.url) return;
       const a = document.createElement('a');
       a.href = link.url;
@@ -182,6 +211,12 @@ parseMarkdown(markdown) {
       a.target = '_blank';
       a.rel = 'noopener noreferrer';
       a.setAttribute('aria-label', link.name || 'social');
+
+      // Analytics metadata
+      a.dataset.section = 'social';
+      a.dataset.name = link.name || '';
+      a.dataset.index = String(idx);
+
       a.appendChild(this.makeIconImg(link.icon, link.name));
       socialContainer.appendChild(a);
     });
@@ -192,7 +227,7 @@ parseMarkdown(markdown) {
     if (!categoriesContainer || !this.data?.categories) return;
     categoriesContainer.innerHTML = '';
 
-    this.data.categories.forEach(category => {
+    this.data.categories.forEach((category) => {
       const categoryDiv = document.createElement('div');
       categoryDiv.className = 'category';
 
@@ -203,14 +238,21 @@ parseMarkdown(markdown) {
       const linksDiv = document.createElement('div');
       linksDiv.className = 'category-links';
 
-      category.links.forEach(link => {
+      category.links.forEach((link, idx) => {
         if (!link?.url) return;
 
         const linkCard = document.createElement('a');
-        linkCard.href = link.url;
+        linkCard.href = this.normaliseHref(link.url);
         linkCard.className = 'link-card';
         linkCard.target = '_blank';
         linkCard.rel = 'noopener noreferrer';
+        linkCard.title = link.name || '';
+
+        // Analytics metadata
+        linkCard.dataset.section = 'category';
+        linkCard.dataset.category = category.name || '';
+        linkCard.dataset.name = link.name || '';
+        linkCard.dataset.index = String(idx);
 
         const iconWrap = document.createElement('div');
         iconWrap.className = 'card-icon';
@@ -232,10 +274,72 @@ parseMarkdown(markdown) {
       categoriesContainer.appendChild(categoryDiv);
     });
   }
+
+  // ---------- Analytics ----------
+  gtagSafe(eventName, params = {}) {
+    try {
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', eventName, {
+          ...params,
+          transport_type: 'beacon',
+          event_callback: params.event_callback || undefined
+        });
+      }
+    } catch (_) { /* never block navigation */ }
+  }
+
+  buildLinkPayload(a) {
+    const url = a.getAttribute('href') || '';
+    const isMailto = /^mailto:/i.test(url);
+    const isTel = /^tel:/i.test(url);
+    const sameOrigin = (() => {
+      try { return new URL(url, location.href).origin === location.origin; }
+      catch { return false; }
+    })();
+
+    const section = a.dataset.section || (a.closest('.social-row') ? 'social' :
+                     a.closest('.category') ? 'category' : 'unknown');
+
+    const category =
+      a.dataset.category ||
+      a.closest('.category')?.querySelector('h3')?.textContent?.trim() ||
+      '';
+
+    const name =
+      a.dataset.name ||
+      a.querySelector('.card-title')?.textContent?.trim() ||
+      a.getAttribute('aria-label') ||
+      a.title ||
+      a.textContent.trim() ||
+      '';
+
+    const index =
+      a.dataset.index ||
+      (a.parentElement ? Array.from(a.parentElement.children).indexOf(a) : -1);
+
+    return {
+      link_text: name,
+      link_url: url,
+      link_protocol: isMailto ? 'mailto' : isTel ? 'tel' : (sameOrigin ? 'internal' : 'https'),
+      link_section: section,         // 'social' | 'category' | 'unknown'
+      link_category: category,       // category name if present
+      link_index: Number(index),     // 0-based position within its section
+      page_title: document.title,
+      page_location: location.href
+    };
+  }
+
+  bindAnalytics() {
+    // Delegated listener; captures all anchors now and future ones
+    document.addEventListener('click', (evt) => {
+      const a = evt.target.closest('a');
+      if (!a) return;
+      const payload = this.buildLinkPayload(a);
+      this.gtagSafe('link_click', payload);
+    }, { capture: true });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   new BiolinkLoader().init();
 });
-
-

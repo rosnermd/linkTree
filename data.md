@@ -36,7 +36,11 @@
   - URL: https://www.omadanetworks.com
   - Description: Prosumer hardware for home networks
 
-  https://www.joinsecret.com?via=benjamin
+- **NextDNS | Manage Private DNS service**:
+  - Icon: https://img.logo.dev/nextdns.io?token=live_6a1a28fd-6420-4492-aeb0-b297461d9de2&size=64&retina=true
+  - URL:  https://nextdns.io/?from=c8ab9c8c
+  - Description: Decent DNS management
+
 
 ### Free and Discounted stuff
 - **DigitalOcean | $5,000 in credits for 1 year**:
