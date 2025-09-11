@@ -125,7 +125,6 @@ body {
 
   padding-bottom: calc(128px + var(--safe-bottom) + var(--kb-safe-area));
 }
-}
 .contact-card { position: relative; }
 
 /* Flip */
