@@ -13,10 +13,7 @@ body {
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --kb-safe-area: 0px; /* updated by JS */
 }
-.contact-section{
-  /* make room for keyboard + safe area when editing */
-  padding-bottom: calc(48px + var(--safe-bottom) + var(--kb-safe-area));
-}
+
 #cf-message{
   /* when focused, ensure the browser can scroll past it */
   scroll-margin-bottom: 120px;
@@ -118,11 +115,16 @@ body {
 
 /* Contact section (always visible) */
 .contact-section {
-  padding: 28px 24px 48px;
+  padding-top: 28px;
+  padding-left:  24px;
+  padding-right: 24px;
   border-top: 1px solid #e0e0e0;
   background: #fff;
   /* guard any transient 3D overflow */
   overflow: hidden;
+
+  padding-bottom: calc(128px + var(--safe-bottom) + var(--kb-safe-area));
+}
 }
 .contact-card { position: relative; }
 

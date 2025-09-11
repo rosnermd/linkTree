@@ -63,69 +63,101 @@
 
   // -------- POST handler (beacon / no-cors fallback for WebViews) --------
   async function submitForm(form, card) {
-    const btn    = qs('#cf-submit', form);
-    const helper = qs('#cf-helper', form);
+  const btn    = document.getElementById('cf-submit');
+  const helper = document.getElementById('cf-helper');
 
-    const payload = {
-      name:    qs('#cf-name', form)?.value?.trim() || '',
-      email:   qs('#cf-email', form)?.value?.trim() || '',
-      message: qs('#cf-message', form)?.value?.trim() || '',
-      source:  location.hostname || 'clikkable.me',
-      ts:      new Date().toISOString()
-    };
+  const payload = {
+    name:    document.getElementById('cf-name')?.value?.trim() || '',
+    email:   document.getElementById('cf-email')?.value?.trim() || '',
+    message: document.getElementById('cf-message')?.value?.trim() || '',
+    source:  location.origin,
+    ts:      new Date().toISOString(),
+    ua:      navigator.userAgent
+  };
 
-    if (!payload.name || !payload.email || !payload.message) {
-      helper.textContent = 'Please complete all fields.';
-      return;
-    }
+  if (!payload.name || !payload.email || !payload.message) {
+    helper.textContent = 'Please complete all fields.';
+    return;
+  }
 
-    helper.textContent = '';
-    btn.disabled = true;
-    btn.textContent = 'Sending…';
+  helper.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
 
-    const bodyStr = JSON.stringify(payload);
-    let queued = false;
+  const bodyStr = JSON.stringify(payload);
+  const ua = navigator.userAgent.toLowerCase();
+  const isConstrainedWebView = /\btiktok|instagram|fb_iab|line\//.test(ua);
 
-    // 1) Try Beacon (no response read; reliable in many WebViews)
+  let delivered = false;
+
+  // 1) Preferred in capable browsers: proper JSON CORS (requires your origin on the allowlist)
+  if (!isConstrainedWebView) {
     try {
-      if (navigator.sendBeacon) {
-        const blob = new Blob([bodyStr], { type: 'application/json' });
-        queued = navigator.sendBeacon(ENDPOINT, blob);
-      }
-    } catch (_) {}
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: bodyStr,
+        keepalive: true,
+        credentials: 'omit',
+        mode: 'cors'
+      });
+      if (res.ok) delivered = true;
+    } catch (_) { /* fall through */ }
+  }
 
-    // 2) Fallback: no-cors fetch using text/plain to avoid preflight
-    if (!queued) {
-      try {
-        await fetch(ENDPOINT, {
-          method: 'POST',
-          mode: 'no-cors',
-          keepalive: true,
-          headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-          body: bodyStr
-        });
-        queued = true; // if it didn't throw, assume queued
-      } catch (_) {}
+  // 2) Try Beacon (doesn’t require readable response; still needs allowlisted Origin)
+  if (!delivered && navigator.sendBeacon) {
+    try {
+      const blob = new Blob([bodyStr], { type: 'application/json' });
+      delivered = navigator.sendBeacon(ENDPOINT, blob);
+    } catch (_) { /* fall through */ }
+  }
+
+  // 3) Last resort for in-app webviews: opaque no-CORS with text/plain (avoids preflight)
+  if (!delivered) {
+    try {
+      await fetch(ENDPOINT, {
+        method: 'POST',
+        mode: 'no-cors',
+        keepalive: true,
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+        body: bodyStr,
+        credentials: 'omit'
+      });
+      delivered = true; // request queued; cannot read response by design
+    } catch (_) { /* fall through */ }
+  }
+
+  // UX: success path regardless of readable response
+  if (delivered) {
+    if (location.search.includes('debug')) {
+      console.log('[contact] queued →', { to: ENDPOINT, origin: location.origin });
     }
+    const cardEl = document.querySelector('#contact .contact-card');
+    cardEl?.classList.add('flipped');
+    form.reset();
+    // recompute height of flip
+    (function sizeFlipOnce() {
+      const card  = document.querySelector('#contact .contact-card');
+      const front = document.querySelector('#contact .flip-face.front');
+      const back  = document.querySelector('#contact .flip-face.back');
+      if (!card || !front || !back) return;
+      const h = Math.max(front.scrollHeight, back.scrollHeight);
+      card.style.setProperty('--flip-height', `${h}px`);
+    })();
 
-    if (queued) {
-      // Treat as success
-      card.classList.add('flipped');
-      form.reset();
-      sizeFlip();
-      setTimeout(() => {
-        card.classList.remove('flipped');
-        btn.disabled = false;
-        btn.textContent = 'Send';
-        sizeFlip();
-      }, 5000);
-    } else {
-      // Could not queue at all
-      helper.textContent = 'Sorry — there was a problem. Please try again.';
+    setTimeout(() => {
+      document.querySelector('#contact .contact-card')?.classList.remove('flipped');
       btn.disabled = false;
       btn.textContent = 'Send';
-    }
+    }, 5000);
+  } else {
+    helper.textContent = 'Send failed (origin likely not allowed). Please try again later.';
+    btn.disabled = false;
+    btn.textContent = 'Send';
   }
+}
+
 
   // -------- wire up form --------
   function wireForm() {
