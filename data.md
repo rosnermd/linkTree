@@ -31,15 +31,26 @@
   - URL: https://unraid.net/pricing?via=c2216a
   - Description: Build a powerful home server
 
+  - **NextDNS | Manage Private DNS service**:
+  - Icon: https://img.logo.dev/nextdns.io?token=live_6a1a28fd-6420-4492-aeb0-b297461d9de2&size=64&retina=true
+  - URL:  https://nextdns.io/?from=c8ab9c8c
+  - Description: Decent DNS management
+
+  - **MullvadVPN | buy activation codes amazon **:
+  - Icon: https://img.logo.dev/mullvad.net?token=live_6a1a28fd-6420-4492-aeb0-b297461d9de2&size=64&retina=true
+  - URL:  https://amzn.to/3HWuKBc
+  - Description: Anonymous VPN service
+
 - **TP-Link Omada**:
   - Icon: https://img.logo.dev/tp-link.com?token=live_6a1a28fd-6420-4492-aeb0-b297461d9de2&size=64&retina=true
   - URL: https://www.omadanetworks.com
   - Description: Prosumer hardware for home networks
 
-- **NextDNS | Manage Private DNS service**:
-  - Icon: https://img.logo.dev/nextdns.io?token=live_6a1a28fd-6420-4492-aeb0-b297461d9de2&size=64&retina=true
-  - URL:  https://nextdns.io/?from=c8ab9c8c
-  - Description: Decent DNS management
+
+
+
+
+  
 
 
 ### Free and Discounted stuff
