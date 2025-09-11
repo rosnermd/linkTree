@@ -9,6 +9,19 @@ body {
   line-height: 1.6;
 }
 
+:root{
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --kb-safe-area: 0px; /* updated by JS */
+}
+.contact-section{
+  /* make room for keyboard + safe area when editing */
+  padding-bottom: calc(48px + var(--safe-bottom) + var(--kb-safe-area));
+}
+#cf-message{
+  /* when focused, ensure the browser can scroll past it */
+  scroll-margin-bottom: 120px;
+}
+
 /* Container */
 .container {
   max-width: 430px;
