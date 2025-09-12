@@ -46,13 +46,6 @@
   - URL: https://www.omadanetworks.com
   - Description: Prosumer hardware for home networks
 
-
-
-
-
-  
-
-
 ### Free and Discounted stuff
 - **DigitalOcean | $5,000 in credits for 1 year**:
   - Icon: https://res.cloudinary.com/secretsaas/image/upload/ar_1.0,c_pad,dpr_auto,f_auto,fl_progressive,h_48,q_auto:good,w_48/v1/production/x4546loshyl2oh1w7gdp30q92gzk

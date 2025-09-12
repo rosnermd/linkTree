@@ -62,7 +62,7 @@
   }
 
   // -------- POST handler (beacon / no-cors fallback for WebViews) --------
-  async function submitForm(form, card) {
+async function submitForm(form, card) {
   const btn    = document.getElementById('cf-submit');
   const helper = document.getElementById('cf-helper');
 
@@ -90,7 +90,7 @@
 
   let delivered = false;
 
-  // 1) Preferred in capable browsers: proper JSON CORS (requires your origin on the allowlist)
+  // 1) Preferred in capable browsers: proper JSON CORS
   if (!isConstrainedWebView) {
     try {
       const res = await fetch(ENDPOINT, {
@@ -105,7 +105,7 @@
     } catch (_) { /* fall through */ }
   }
 
-  // 2) Try Beacon (doesn’t require readable response; still needs allowlisted Origin)
+  // 2) Try Beacon
   if (!delivered && navigator.sendBeacon) {
     try {
       const blob = new Blob([bodyStr], { type: 'application/json' });
@@ -113,7 +113,7 @@
     } catch (_) { /* fall through */ }
   }
 
-  // 3) Last resort for in-app webviews: opaque no-CORS with text/plain (avoids preflight)
+  // 3) Last resort: no-CORS fallback
   if (!delivered) {
     try {
       await fetch(ENDPOINT, {
@@ -124,19 +124,30 @@
         body: bodyStr,
         credentials: 'omit'
       });
-      delivered = true; // request queued; cannot read response by design
+      delivered = true;
     } catch (_) { /* fall through */ }
   }
 
+  // ---- Umami tracking for form submit ----
+  try {
+    if (typeof window.umami === 'function') {
+      window.umami.track('form_submit', {
+        form_id: 'contact-form',
+        page_title: document.title,
+        page_location: location.href,
+        name: payload.name ? 'filled' : 'empty',
+        email: payload.email ? 'filled' : 'empty',
+        message: payload.message ? 'filled' : 'empty'
+      });
+    }
+  } catch (_) { /* never block UX */ }
+
   // UX: success path regardless of readable response
   if (delivered) {
-    if (location.search.includes('debug')) {
-      console.log('[contact] queued →', { to: ENDPOINT, origin: location.origin });
-    }
     const cardEl = document.querySelector('#contact .contact-card');
     cardEl?.classList.add('flipped');
     form.reset();
-    // recompute height of flip
+
     (function sizeFlipOnce() {
       const card  = document.querySelector('#contact .contact-card');
       const front = document.querySelector('#contact .flip-face.front');
@@ -157,6 +168,7 @@
     btn.textContent = 'Send';
   }
 }
+
 
 
   // -------- wire up form --------
