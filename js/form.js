@@ -1,6 +1,6 @@
 // form.js
 (() => {
-  const ENDPOINT = 'https://load.datatruck.cc/to/LPxR6Fa2UOsMXADSrLUJ';
+  const ENDPOINT = 'ADD YOUR OWN ENDPOINT HERE';
   const qs = (sel, root = document) => root.querySelector(sel);
   const on = (el, ev, fn, opts) => el && el.addEventListener(ev, fn, opts);
 
