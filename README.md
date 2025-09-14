@@ -20,7 +20,7 @@ This project lets you create your own personal landing page with profile image, 
 1. **Clone this repository**
    ```sh
    git clone https://github.com/kingfisherfox/clikkable.git
-   cd clikkable-bensite
+   cd clikkable
    ```
 2. **Customise your profile**
    - Edit `data.md`:
