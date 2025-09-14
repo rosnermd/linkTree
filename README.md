@@ -11,7 +11,7 @@ This project lets you create your own personal landing page with profile image, 
   - Scrolls into view when clicking an email link.
   - Posts JSON payloads to any endpoint (Zapier, Make, DataTruck, etc.).
   - Includes fallbacks for TikTok/Instagram/Facebook in-app browsers.
-- **Analytics ready:** Drop in [Umami](https://umami.is/), [Plausible](https://plausible.io/), [Mato](https://mato.dev/), or Google Analytics.
+- **Analytics ready:** Drop in [Umami]([https://umami.is/](https://github.com/umami-software/umami)), [Plausible]([https://plausible.io/](https://github.com/plausible/analytics)), [Matomo]([https://mato.dev/](https://github.com/matomo-org/matomo)), or Google Analytics.
 - **Accessible and responsive:** Works across devices, supports fallback for old webviews, and auto-adjusts layout.
 - **Deploy for free:** Optimised for Cloudflare Pages with no server requirements.
 
