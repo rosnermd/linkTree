@@ -2,26 +2,22 @@
 # Biolink Configuration
 
 ## Profile
-- **Name**: YOUR NAME
-- **Username**: @YOURUSERNAME
-- **Hero Image**: img/profile.jpg
+- **Name**: Matt Rosner
+- **Username**: @parent_assist
+- **Hero Image**: img/lone-tree.jpg
 
 ## Social Links
 - **TikTok**:
   - Icon: https://cdn-icons-png.flaticon.com/512/3046/3046121.png
-  - URL: https://tiktok.com/@YOURUSERNAME
+  - URL: https://tiktok.com/@parent_assist
 
 - **GitHub**:
   - Icon: https://cdn-icons-png.flaticon.com/512/733/733553.png
-  - URL: https://github.com/YOURUSERNAME
-
-- **YouTube**:
-  - Icon: https://cdn-icons-png.flaticon.com/512/1384/1384060.png
-  - URL: https://youtube.com/@YOURUSERNAME
+  - URL: https://github.com/rosnermd
   
 - **Email**:
   - Icon: https://cdn-icons-png.flaticon.com/512/732/732200.png
-  - URL: mailto: 
+  - URL: mailto: automation@geargrind.xyz
 
 ## Categories
 
