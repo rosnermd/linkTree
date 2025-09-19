@@ -4,7 +4,7 @@
 ## Profile
 - **Name**: Matt Rosner
 - **Username**: @parent_assist
-- **Hero Image**: img/lone-tree.png
+- **Hero Image**: img/profile.jpg
 
 ## Social Links
 - **TikTok**:
